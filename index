@@ -14,11 +14,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #F9F7F2; color: #1e293b; }
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .step-indicator { height: 4px; border-radius: 2px; transition: all 0.4s ease; }
-        .bg-medvisa-navy { background-color: #0A3161; }
-        .bg-medvisa-red { background-color: #B31942; }
     </style>
 </head>
 <body>
@@ -59,7 +57,7 @@
                 <div className="flex flex-wrap gap-2 justify-center py-4">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                         <button key={num} type="button" onClick={() => onChange(num)}
-                            className={`w-10 h-10 rounded-full font-bold transition-all border-2 ${value === num ? 'bg-[#B31942] border-[#B31942] text-white scale-110' : 'bg-white border-slate-200 text-slate-400 hover:border-[#B31942]'}`}
+                            className={`w-10 h-10 rounded-full font-bold transition-all border-2 ${value === num ? 'bg-[#B31942] border-[#B31942] text-white scale-110 shadow-lg' : 'bg-white border-slate-200 text-slate-400 hover:border-[#B31942]'}`}
                         > {num} </button>
                     ))}
                 </div>
@@ -80,7 +78,7 @@
                     if (response.ok) setSubmitted(true);
                     else throw new Error();
                 } catch (error) {
-                    setSubmitted(true); // Sucesso visual para o usuário
+                    setSubmitted(true); 
                 } finally {
                     setLoading(false);
                 }
@@ -95,8 +93,8 @@
                         <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center border animate-in">
                             <Icon name="check-circle" size={80} className="text-[#B31942] mb-6" />
                             <h2 className="text-3xl font-black mb-4 text-[#0A3161]">Aplicação Recebida!</h2>
-                            <p className="text-slate-500 mb-8 leading-relaxed">Nossa equipe analisará seu perfil detalhadamente. Entraremos em contato caso faça sentido avançar para a mentoria individual.</p>
-                            <button onClick={() => window.location.reload()} className="w-full py-4 text-white rounded-2xl font-bold bg-[#0A3161] shadow-lg">Voltar ao Início</button>
+                            <p className="text-slate-500 mb-8 leading-relaxed">Nossa equipe analisará seu perfil cuidadosamente. Entraremos em contato via WhatsApp ou E-mail com os selecionados.</p>
+                            <button onClick={() => window.location.reload()} className="w-full py-4 text-white rounded-2xl font-bold bg-[#0A3161] shadow-lg uppercase tracking-widest">Voltar ao Início</button>
                         </div>
                     </div>
                 );
@@ -113,7 +111,7 @@
                                     <div key={i} className={`step-indicator w-6 ${step > i ? 'bg-[#B31942]' : 'bg-slate-200'}`} />
                                 ))}
                             </div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Etapa {step} de {totalSteps}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Passo {step} de {totalSteps}</p>
                         </div>
 
                         <div className="bg-white rounded-[2rem] shadow-2xl border overflow-hidden">
@@ -121,23 +119,23 @@
                                 
                                 {step === 1 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase tracking-tight">Dados Pessoais</h3>
-                                        <input type="text" placeholder="Nome Completo" className="w-full p-4 bg-slate-50 border rounded-2xl" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase">Identificação</h3>
+                                        <input type="text" placeholder="Nome Completo" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
                                         <div className="grid grid-cols-2 gap-4">
                                             <input type="number" placeholder="Idade" className="p-4 bg-slate-50 border rounded-2xl" value={formData.idade} onChange={e => setFormData({...formData, idade: e.target.value})} />
-                                            <input type="text" placeholder="WhatsApp (+55...)" className="p-4 bg-slate-50 border rounded-2xl" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} />
+                                            <input type="text" placeholder="WhatsApp (Ex: +55 27 999998888)" className="p-4 bg-slate-50 border rounded-2xl" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} />
                                         </div>
                                         <input type="email" placeholder="Seu melhor E-mail" className="w-full p-4 bg-slate-50 border rounded-2xl" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                                        <button type="button" onClick={nextStep} className="w-full py-5 bg-[#0A3161] text-white rounded-2xl font-black shadow-xl uppercase">Próximo</button>
+                                        <button type="button" onClick={() => { if(formData.nome && formData.email) nextStep() }} className="w-full py-5 bg-[#0A3161] text-white rounded-2xl font-black shadow-xl uppercase">Próximo</button>
                                     </div>
                                 )}
 
                                 {step === 2 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Localização e Carreira</h3>
-                                        <input type="text" placeholder="Instagram / Twitter Link" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.redesSociais} onChange={e => setFormData({...formData, redesSociais: e.target.value})} />
-                                        <input type="text" placeholder="Cidade e País de residência" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.localizacao} onChange={e => setFormData({...formData, localizacao: e.target.value})} />
-                                        <input type="text" placeholder="Nome da Faculdade de Medicina" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.instituicao} onChange={e => setFormData({...formData, instituicao: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Localização e Redes</h3>
+                                        <input type="text" placeholder="Link de Redes Sociais" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.redesSociais} onChange={e => setFormData({...formData, redesSociais: e.target.value})} />
+                                        <input type="text" placeholder="Cidade e País onde reside" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.localizacao} onChange={e => setFormData({...formData, localizacao: e.target.value})} />
+                                        <input type="text" placeholder="Faculdade de Medicina" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.instituicao} onChange={e => setFormData({...formData, instituicao: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -163,12 +161,12 @@
 
                                 {step === 4 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Steps USMLE</h3>
-                                        <p className="text-xs font-bold text-slate-400 uppercase">Status Step 1:</p>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Status dos Steps</h3>
+                                        <p className="text-xs font-bold text-slate-400 uppercase">Step 1:</p>
                                         <div className="grid grid-cols-2 gap-2">
                                             {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep1: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] ${formData.statusStep1 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
                                         </div>
-                                        <p className="text-xs font-bold text-slate-400 uppercase pt-2">Status Step 2 CK:</p>
+                                        <p className="text-xs font-bold text-slate-400 uppercase pt-2">Step 2 CK:</p>
                                         <div className="grid grid-cols-2 gap-2">
                                             {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep2: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] ${formData.statusStep2 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
                                         </div>
@@ -204,8 +202,8 @@
                                 {step === 6 && (
                                     <div className="space-y-6 animate-in">
                                         <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Visto e Currículo</h3>
-                                        <input type="text" placeholder="Visto atual (Ex: B1/B2, J1, H1B ou GC)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.statusVisto} onChange={e => setFormData({...formData, statusVisto: e.target.value})} />
-                                        <textarea placeholder="Fale sobre suas publicações científicas ou ensino" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoPublicacoes} onChange={e => setFormData({...formData, descritivoPublicacoes: e.target.value})} />
+                                        <input type="text" placeholder="Visto atual (Ex: B1/B2, J1, Green Card)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.statusVisto} onChange={e => setFormData({...formData, statusVisto: e.target.value})} />
+                                        <textarea placeholder="Publicações científicas ou experiência de ensino" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoPublicacoes} onChange={e => setFormData({...formData, descritivoPublicacoes: e.target.value})} />
                                         <p className="font-bold text-slate-600 pt-2">Nível de Inglês:</p>
                                         <div className="grid grid-cols-2 gap-2">
                                             {['Básico', 'Intermediário', 'Avançado', 'Fluente'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, nivelIngles: o})} className={`py-3 border-2 rounded-xl font-bold text-xs uppercase ${formData.nivelIngles === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
@@ -219,11 +217,11 @@
 
                                 {step === 7 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Habilidades e Liderança</h3>
-                                        <p className="font-bold text-slate-600 text-center">Conforto com textos médicos em inglês (1-10):</p>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Habilidades</h3>
+                                        <p className="font-bold text-slate-600 text-center">Conforto lendo textos médicos em inglês (1-10):</p>
                                         <ScaleSelector value={formData.confortoLeituraIngles} onChange={v => setFormData({...formData, confortoLeituraIngles: v})} />
-                                        <input type="text" placeholder="Testes Oficiais (TOEFL, IELTS, OET) - Nota/Data" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.testesOficiais} onChange={e => setFormData({...formData, testesOficiais: e.target.value})} />
-                                        <textarea placeholder="Já exerceu cargo de liderança relevante?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoLideranca} onChange={e => setFormData({...formData, descritivoLideranca: e.target.value})} />
+                                        <input type="text" placeholder="TOEFL, IELTS ou OET? (Nota/Data)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.testesOficiais} onChange={e => setFormData({...formData, testesOficiais: e.target.value})} />
+                                        <textarea placeholder="Exerceu cargos de liderança?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoLideranca} onChange={e => setFormData({...formData, descritivoLideranca: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -234,12 +232,9 @@
                                 {step === 8 && (
                                     <div className="space-y-6 animate-in">
                                         <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Objetivos</h3>
-                                        <input type="text" placeholder="Principal objetivo (Ex: Residência em Cirurgia)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.objetivoEUA} onChange={e => setFormData({...formData, objetivoEUA: e.target.value})} />
-                                        <textarea placeholder="Por que os EUA como objetivo de carreira?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.motivoEUA} onChange={e => setFormData({...formData, motivoEUA: e.target.value})} />
-                                        <div className="grid gap-4">
-                                            <input type="text" placeholder="Horas diárias para estudos?" className="p-4 bg-slate-50 border rounded-2xl" value={formData.horasEstudo} onChange={e => setFormData({...formData, horasEstudo: e.target.value})} />
-                                            <input type="text" placeholder="Expectativa de tempo para o Match?" className="p-4 bg-slate-50 border rounded-2xl" value={formData.expectativaMatch} onChange={e => setFormData({...formData, expectativaMatch: e.target.value})} />
-                                        </div>
+                                        <input type="text" placeholder="Objetivo nos EUA (Ex: Residência em Cirurgia)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.objetivoEUA} onChange={e => setFormData({...formData, objetivoEUA: e.target.value})} />
+                                        <textarea placeholder="Por que os EUA?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.motivoEUA} onChange={e => setFormData({...formData, motivoEUA: e.target.value})} />
+                                        <input type="text" placeholder="Horas diárias de estudo?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.horasEstudo} onChange={e => setFormData({...formData, horasEstudo: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -250,15 +245,15 @@
                                 {step === 9 && (
                                     <div className="space-y-6 animate-in text-center">
                                         <h3 className="text-xl font-black text-[#0A3161] uppercase">Compromisso Final</h3>
-                                        <p className="font-bold text-slate-500">Comprometimento financeiro e pessoal (0-10):</p>
+                                        <p className="font-bold text-slate-500">Comprometimento pessoal e financeiro (0-10):</p>
                                         <ScaleSelector value={formData.compromissoGeral} onChange={v => setFormData({...formData, compromissoGeral: v})} />
                                         <div className="flex gap-4 py-2">
-                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, dispostoMudarHabitos: o})} className={`flex-1 py-3 border-2 rounded-xl font-bold ${formData.dispostoMudarHabitos === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white text-slate-400'}`}>Disposto a mudar hábitos: {o}</button>)}
+                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, dispostoMudarHabitos: o})} className={`flex-1 py-3 border-2 rounded-xl font-bold ${formData.dispostoMudarHabitos === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white text-slate-400'}`}>Seguir recomendações: {o}</button>)}
                                         </div>
-                                        <textarea placeholder="O que você espera do seu mentor?" className="w-full p-4 bg-slate-50 border rounded-2xl text-left" value={formData.expectativaMentor} onChange={e => setFormData({...formData, expectativaMentor: e.target.value})} />
-                                        <input type="text" placeholder="Qual plano da mentoria mais se adequa a você?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.planoMentoria} onChange={e => setFormData({...formData, planoMentoria: e.target.value})} />
+                                        <textarea placeholder="O que espera do mentor?" className="w-full p-4 bg-slate-50 border rounded-2xl text-left h-24" value={formData.expectativaMentor} onChange={e => setFormData({...formData, expectativaMentor: e.target.value})} />
+                                        <input type="text" placeholder="Qual plano de mentoria se adequa a você?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.planoMentoria} onChange={e => setFormData({...formData, planoMentoria: e.target.value})} />
                                         <div className="flex gap-4 pt-6">
-                                            <button type="button" onClick={prevStep} className="flex-1 py-5 border-2 rounded-2xl font-bold">Voltar</button>
+                                            <button type="button" onClick={prevStep} className="flex-1 py-5 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="submit" disabled={loading} className="flex-[2] py-5 bg-[#B31942] text-white rounded-2xl font-black shadow-2xl active:scale-95 transition-all">
                                                 {loading ? "ENVIANDO..." : "FINALIZAR APLICAÇÃO"}
                                             </button>
@@ -268,7 +263,7 @@
                             </form>
                         </div>
                     </main>
-                    <footer className="py-12 bg-white border-t text-center space-y-4">
+                    <footer className="py-16 bg-white border-t text-center space-y-4">
                         <p className="text-[#0A3161] text-xs font-black uppercase tracking-[0.4em]">Excelência Médica Sem Fronteiras</p>
                         <p className="text-slate-400 text-[10px] font-medium tracking-wider uppercase">© 2026 MEDVISA MENTORIA. TODOS OS DIREITOS RESERVADOS.</p>
                     </footer>
