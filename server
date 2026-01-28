@@ -11,12 +11,18 @@ const app = express();
 // CHAVE DE API DIRETA (Confirmada como funcional)
 const resend = new Resend('re_Mq4MYnwE_HSfQiLWmg3FCYZv95qKyppbM');
 
-app.use(cors({ origin: '*', methods: ['POST', 'GET'] }));
+// Configuração de CORS ajustada para ambiente serverless
+app.use(cors({ 
+    origin: '*', 
+    methods: ['POST', 'GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
 /**
  * Autenticação Google Sheets
- * Nota: Certifique-se de configurar o novo GOOGLE_SHEETS_ID no painel do Render
+ * Nota: Certifique-se de configurar GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL e GOOGLE_SHEETS_ID no Vercel
  */
 async function getGoogleSheets() {
     try {
@@ -39,81 +45,69 @@ async function getGoogleSheets() {
     }
 }
 
-app.get('/', (req, res) => res.send("Aplicação Mentoria MedVisa - Backend Ativo!"));
+app.get('/', (req, res) => res.send("Backend MedVisa - Vercel Ready!"));
 
 // Rota Principal para Leads da Aplicação
 app.post('/api/leads', async (req, res) => {
     const data = req.body;
-    console.log("Processando Nova Aplicação Detalhada:", data.nome);
     
-    // 1. Resposta imediata para evitar Bad Gateway
-    res.status(200).json({ success: true });
-
-    // 2. Processamento em Background
-    (async () => {
-        try {
-            // GRAVAR NA NOVA PLANILHA (Colunas A até AJ)
-            const sheets = await getGoogleSheets();
-            if (sheets) {
-                await sheets.spreadsheets.values.append({
-                    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-                    range: 'A:AJ',
-                    valueInputOption: 'USER_ENTERED',
-                    resource: {
-                        values: [[
-                            new Date().toLocaleString('pt-BR'),
-                            data.nome, data.idade, data.whatsapp, data.email,
-                            data.redesSociais, data.localizacao, data.instituicao,
-                            data.faseAtual, data.anoFormacao,
-                            data.statusStep1, data.statusStep2, data.scoreStep2,
-                            data.possuiLoRs, data.tipoLoRs, data.possuiUSCE, data.descritivoUSCE,
-                            data.statusVisto, data.possuiPublicacoes, data.descritivoPublicacoes,
-                            data.nivelIngles, data.confortoLeituraIngles, data.testesOficiais,
-                            data.cargoLideranca, data.descritivoLideranca,
-                            data.objetivoEUA, data.motivoEUA, data.horasEstudo,
-                            data.dispostoMudarHabitos, data.expectativaMentor, data.apoioFamiliar,
-                            data.expectativaMatch, data.compromissoGeral, data.planoMentoria,
-                            data.desafios // Payload de desafios concatenado no front
-                        ]]
-                    }
-                });
-                console.log("✅ Nova Planilha de Aplicação atualizada.");
-            }
-
-            // ENVIAR NOTIFICAÇÃO VIA RESEND
-            await resend.emails.send({
-                from: 'onboarding@resend.dev',
-                to: 'medvisausa@gmail.com',
-                subject: `NOVA APLICAÇÃO: ${data.nome} | Fase: ${data.faseAtual}`,
-                html: `
-                    <div style="font-family: sans-serif; color: #1e293b; max-width: 600px;">
-                        <h2 style="color: #0A3161; border-bottom: 2px solid #B31942; padding-bottom: 10px;">Nova Aplicação Detalhada</h2>
-                        <p><strong>Candidato:</strong> ${data.nome} (${data.idade} anos)</p>
-                        <p><strong>WhatsApp:</strong> ${data.whatsapp}</p>
-                        <p><strong>Formação:</strong> ${data.instituicao} - ${data.anoFormacao}</p>
-                        <hr>
-                        <h3>Resumo Técnico:</h3>
-                        <ul>
-                            <li><strong>Step 1:</strong> ${data.statusStep1}</li>
-                            <li><strong>Step 2 CK:</strong> ${data.statusStep2} (Score: ${data.scoreStep2 || 'N/A'})</li>
-                            <li><strong>LoRs EUA:</strong> ${data.possuiLoRs}</li>
-                            <li><strong>Nível Inglês:</strong> ${data.nivelIngles} (${data.confortoLeituraIngles}/10)</li>
-                            <li><strong>Comprometimento:</strong> ${data.compromissoGeral}/10</li>
-                        </ul>
-                        <p><strong>Objetivo:</strong> ${data.objetivoEUA}</p>
-                        <p style="background: #f1f5f9; padding: 10px; border-radius: 5px;">
-                            <em>Consulte a nova planilha no Google Sheets para ver as respostas completas sobre visto, publicações e desafios.</em>
-                        </p>
-                    </div>
-                `
+    try {
+        // 1. GRAVAR NA PLANILHA (Colunas A até AJ)
+        const sheets = await getGoogleSheets();
+        if (sheets) {
+            await sheets.spreadsheets.values.append({
+                spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+                range: 'A:AJ',
+                valueInputOption: 'USER_ENTERED',
+                resource: {
+                    values: [[
+                        new Date().toLocaleString('pt-BR'),
+                        data.nome, data.idade, data.whatsapp, data.email,
+                        data.redesSociais, data.localizacao, data.instituicao,
+                        data.faseAtual, data.anoFormacao,
+                        data.statusStep1, data.statusStep2, data.scoreStep2,
+                        data.possuiLoRs, data.tipoLoRs, data.possuiUSCE, data.descritivoUSCE,
+                        data.statusVisto, data.possuiPublicacoes, data.descritivoPublicacoes,
+                        data.nivelIngles, data.confortoLeituraIngles, data.testesOficiais,
+                        data.cargoLideranca, data.descritivoLideranca,
+                        data.objetivoEUA, data.motivoEUA, data.horasEstudo,
+                        data.dispostoMudarHabitos, data.expectativaMentor, data.apoioFamiliar,
+                        data.expectativaMatch, data.compromissoGeral, data.planoMentoria,
+                        data.desafios
+                    ]]
+                }
             });
-            console.log("✅ E-mail de notificação enviado.");
-
-        } catch (error) {
-            console.error("❌ Erro no processamento de background:", error.message);
         }
-    })();
+
+        // 2. ENVIAR NOTIFICAÇÃO VIA RESEND
+        await resend.emails.send({
+            from: 'onboarding@resend.dev',
+            to: 'medvisausa@gmail.com',
+            subject: `NOVA APLICAÇÃO: ${data.nome} | Fase: ${data.faseAtual}`,
+            html: `
+                <div style="font-family: sans-serif; color: #1e293b; max-width: 600px; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px;">
+                    <h2 style="color: #0A3161; border-bottom: 2px solid #B31942; padding-bottom: 10px;">Nova Candidatura Premium</h2>
+                    <p><strong>Candidato:</strong> ${data.nome} (${data.idade} anos)</p>
+                    <p><strong>WhatsApp:</strong> ${data.whatsapp}</p>
+                    <p><strong>E-mail:</strong> ${data.email}</p>
+                    <hr>
+                    <p><strong>Step 1:</strong> ${data.statusStep1} | <strong>Step 2 CK:</strong> ${data.statusStep2}</p>
+                    <p><strong>Inglês:</strong> ${data.nivelIngles} (${data.confortoLeituraIngles}/10)</p>
+                    <p><strong>Compromisso:</strong> ${data.compromissoGeral}/10</p>
+                    <p style="background: #f8fafc; padding: 10px; border-radius: 5px; font-size: 12px; color: #64748b;">
+                        Os dados completos de USCE, LoRs, Publicações e Visto foram salvos na planilha Google.
+                    </p>
+                </div>
+            `
+        });
+
+        return res.status(200).json({ success: true, message: "Aplicação processada." });
+
+    } catch (error) {
+        console.error("ERRO NO BACKEND:", error.message);
+        return res.status(500).json({ success: false, error: error.message });
+    }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Backend da Aplicação rodando na porta ${PORT}`));
+// Exportação obrigatória para o Vercel tratar como Serverless Function
+module.exports = app;
