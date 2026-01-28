@@ -5,3 +5,6 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
+3.  **Variáveis de Ambiente:** No painel do Vercel, adicione `GOOGLE_SHEETS_ID` (com o ID da sua **nova** planilha), `GOOGLE_SERVICE_ACCOUNT_EMAIL` e `GOOGLE_PRIVATE_KEY`.
+
+Estes arquivos garantem que o sistema seja robusto, serverless e capture todos os dados premium solicitados nas imagens. Qualquer dúvida na configuração do Vercel, estou aqui!
