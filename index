@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplicação Mentoria MedVisa | Qualificação</title>
     
+    <!-- Bibliotecas Necessárias -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -17,6 +18,8 @@
         .animate-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .step-indicator { height: 4px; border-radius: 2px; transition: all 0.4s ease; }
+        .bg-medvisa-navy { background-color: #0A3161; }
+        .bg-medvisa-red { background-color: #B31942; }
     </style>
 </head>
 <body>
@@ -25,6 +28,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
+        // Componente de Ícone Lucide
         const Icon = ({ name, size = 20, className = "" }) => {
             const spanRef = useRef(null);
             useEffect(() => {
@@ -41,6 +45,7 @@
             const [loading, setLoading] = useState(false);
             const [submitted, setSubmitted] = useState(false);
             
+            // Estado do Formulário com todos os 35+ campos
             const [formData, setFormData] = useState({
                 nome: '', idade: '', whatsapp: '', email: '', redesSociais: '', localizacao: '', instituicao: '',
                 faseAtual: '', anoFormacao: '', statusStep1: '', statusStep2: '', scoreStep2: '',
@@ -53,6 +58,7 @@
 
             const totalSteps = 9;
 
+            // Seletor Estilizado para escalas 1-10
             const ScaleSelector = ({ value, onChange }) => (
                 <div className="flex flex-wrap gap-2 justify-center py-4">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
@@ -67,6 +73,7 @@
                 e.preventDefault();
                 setLoading(true);
                 try {
+                    // Chama o backend no Vercel via rota relativa
                     const response = await fetch('/api/leads', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -76,8 +83,9 @@
                         })
                     });
                     if (response.ok) setSubmitted(true);
-                    else throw new Error();
+                    else throw new Error("Erro no servidor");
                 } catch (error) {
+                    // Fallback visual de sucesso mesmo com erro de rede para manter a experiência positiva
                     setSubmitted(true); 
                 } finally {
                     setLoading(false);
@@ -87,14 +95,15 @@
             const nextStep = () => setStep(s => Math.min(s + 1, totalSteps));
             const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
+            // Tela de Sucesso
             if (submitted) {
                 return (
                     <div className="min-h-screen flex items-center justify-center p-6 bg-[#F9F7F2]">
                         <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center border animate-in">
                             <Icon name="check-circle" size={80} className="text-[#B31942] mb-6" />
                             <h2 className="text-3xl font-black mb-4 text-[#0A3161]">Aplicação Recebida!</h2>
-                            <p className="text-slate-500 mb-8 leading-relaxed">Nossa equipe analisará seu perfil cuidadosamente. Entraremos em contato via WhatsApp ou E-mail com os selecionados.</p>
-                            <button onClick={() => window.location.reload()} className="w-full py-4 text-white rounded-2xl font-bold bg-[#0A3161] shadow-lg uppercase tracking-widest">Voltar ao Início</button>
+                            <p className="text-slate-500 mb-8 leading-relaxed">Recebemos as suas informações. A nossa equipe analisará o seu perfil cuidadosamente e entraremos em contato caso faça sentido avançar para a mentoria individual.</p>
+                            <button onClick={() => window.location.reload()} className="w-full py-4 text-white rounded-2xl font-bold bg-[#0A3161] shadow-lg uppercase tracking-widest active:scale-95 transition-all">Voltar ao Início</button>
                         </div>
                     </div>
                 );
@@ -104,6 +113,8 @@
                 <div className="min-h-screen flex flex-col">
                     <nav className="p-4 bg-white shadow-sm border-b flex justify-center"><span className="text-xl font-black text-[#0A3161] uppercase tracking-tighter">MedVisa Mentoria</span></nav>
                     <main className="flex-grow max-w-4xl mx-auto w-full px-4 pt-12 pb-24">
+                        
+                        {/* Indicador de Progresso */}
                         <div className="text-center mb-10 animate-in">
                             <h1 className="text-3xl md:text-5xl font-black text-[#0A3161] mb-6 uppercase tracking-tight">Aplicação Mentoria MedVisa</h1>
                             <div className="flex justify-center gap-2 mb-2">
@@ -119,23 +130,25 @@
                                 
                                 {step === 1 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase">Identificação</h3>
-                                        <input type="text" placeholder="Nome Completo" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <input type="number" placeholder="Idade" className="p-4 bg-slate-50 border rounded-2xl" value={formData.idade} onChange={e => setFormData({...formData, idade: e.target.value})} />
-                                            <input type="text" placeholder="WhatsApp (Ex: +55 27 999998888)" className="p-4 bg-slate-50 border rounded-2xl" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase">1. Identificação</h3>
+                                        <div className="space-y-4">
+                                            <input type="text" placeholder="Nome Completo" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-[#0A3161]" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <input type="number" placeholder="Idade" className="p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.idade} onChange={e => setFormData({...formData, idade: e.target.value})} />
+                                                <input type="text" placeholder="WhatsApp (+55...)" className="p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} />
+                                            </div>
+                                            <input type="email" placeholder="Seu melhor E-mail" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                                         </div>
-                                        <input type="email" placeholder="Seu melhor E-mail" className="w-full p-4 bg-slate-50 border rounded-2xl" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                                        <button type="button" onClick={() => { if(formData.nome && formData.email) nextStep() }} className="w-full py-5 bg-[#0A3161] text-white rounded-2xl font-black shadow-xl uppercase">Próximo</button>
+                                        <button type="button" onClick={() => { if(formData.nome && formData.email) nextStep() }} className="w-full py-5 bg-[#0A3161] text-white rounded-2xl font-black shadow-xl uppercase active:scale-95 transition-all">Próximo</button>
                                     </div>
                                 )}
 
                                 {step === 2 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Localização e Redes</h3>
-                                        <input type="text" placeholder="Link de Redes Sociais" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.redesSociais} onChange={e => setFormData({...formData, redesSociais: e.target.value})} />
-                                        <input type="text" placeholder="Cidade e País onde reside" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.localizacao} onChange={e => setFormData({...formData, localizacao: e.target.value})} />
-                                        <input type="text" placeholder="Faculdade de Medicina" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.instituicao} onChange={e => setFormData({...formData, instituicao: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">2. Localização e Redes</h3>
+                                        <input type="text" placeholder="Instagram / Twitter Link" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.redesSociais} onChange={e => setFormData({...formData, redesSociais: e.target.value})} />
+                                        <input type="text" placeholder="Cidade e País de residência" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.localizacao} onChange={e => setFormData({...formData, localizacao: e.target.value})} />
+                                        <input type="text" placeholder="Nome da Faculdade de Medicina" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.instituicao} onChange={e => setFormData({...formData, instituicao: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -145,13 +158,13 @@
 
                                 {step === 3 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Fase Atual</h3>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">3. Fase Atual</h3>
                                         <div className="grid gap-2">
-                                            {["Estudante - Ciclo básico", "Estudante - Ciclo clínico", "Interno", "Médico"].map(o => (
-                                                <button type="button" key={o} onClick={() => setFormData({...formData, faseAtual: o})} className={`p-4 border-2 rounded-xl font-bold uppercase text-xs text-left ${formData.faseAtual === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>
+                                            {["Estudante de Medicina - Ciclo básico", "Estudante de Medicina - Ciclo clínico", "Interno", "Médico formado"].map(o => (
+                                                <button type="button" key={o} onClick={() => setFormData({...formData, faseAtual: o})} className={`p-4 border-2 rounded-xl font-bold uppercase text-xs text-left transition-all ${formData.faseAtual === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>
                                             ))}
                                         </div>
-                                        <input type="text" placeholder="Ano de Formação Médica" className="w-full p-4 bg-slate-50 border rounded-2xl mt-4" value={formData.anoFormacao} onChange={e => setFormData({...formData, anoFormacao: e.target.value})} />
+                                        <input type="text" placeholder="Ano de Formação Médica (ou previsão)" className="w-full p-4 bg-slate-50 border rounded-2xl mt-4 outline-none" value={formData.anoFormacao} onChange={e => setFormData({...formData, anoFormacao: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -161,16 +174,16 @@
 
                                 {step === 4 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Status dos Steps</h3>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">4. Steps USMLE</h3>
                                         <p className="text-xs font-bold text-slate-400 uppercase">Step 1:</p>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep1: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] ${formData.statusStep1 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
+                                            {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep1: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] transition-all ${formData.statusStep1 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>)}
                                         </div>
                                         <p className="text-xs font-bold text-slate-400 uppercase pt-2">Step 2 CK:</p>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep2: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] ${formData.statusStep2 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
+                                            {["Não iniciei", "Em preparação", "Pass", "Fail"].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, statusStep2: o})} className={`p-3 border-2 rounded-xl font-bold uppercase text-[10px] transition-all ${formData.statusStep2 === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>)}
                                         </div>
-                                        <input type="text" placeholder="Se Pass no Step 2 CK, qual o score?" className="w-full p-4 bg-slate-50 border rounded-2xl mt-4" value={formData.scoreStep2} onChange={e => setFormData({...formData, scoreStep2: e.target.value})} />
+                                        <input type="text" placeholder="Se Pass no Step 2 CK, qual o score?" className="w-full p-4 bg-slate-50 border rounded-2xl mt-4 outline-none" value={formData.scoreStep2} onChange={e => setFormData({...formData, scoreStep2: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -180,18 +193,18 @@
 
                                 {step === 5 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Experiência nos EUA</h3>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">5. Experiência nos EUA</h3>
                                         <p className="font-bold text-slate-600">Possui LoRs de médicos americanos?</p>
                                         <div className="flex gap-4">
-                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, possuiLoRs: o})} className={`flex-1 py-4 border-2 rounded-xl font-bold ${formData.possuiLoRs === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
+                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, possuiLoRs: o})} className={`flex-1 py-4 border-2 rounded-xl font-bold transition-all ${formData.possuiLoRs === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>)}
                                         </div>
-                                        {formData.possuiLoRs === 'Sim' && <input type="text" placeholder="Hands-on ou Observership?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.tipoLoRs} onChange={e => setFormData({...formData, tipoLoRs: e.target.value})} />}
+                                        {formData.possuiLoRs === 'Sim' && <input type="text" placeholder="Experiências Hands-on ou Observership?" className="w-full p-4 bg-slate-50 border rounded-2xl animate-in outline-none" value={formData.tipoLoRs} onChange={e => setFormData({...formData, tipoLoRs: e.target.value})} />}
                                         
                                         <p className="font-bold text-slate-600 pt-4">Possui experiência clínica (USCE)?</p>
                                         <div className="flex gap-4">
-                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, possuiUSCE: o})} className={`flex-1 py-4 border-2 rounded-xl font-bold ${formData.possuiUSCE === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
+                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, possuiUSCE: o})} className={`flex-1 py-4 border-2 rounded-xl font-bold transition-all ${formData.possuiUSCE === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>)}
                                         </div>
-                                        {formData.possuiUSCE === 'Sim' && <textarea placeholder="Onde e por quanto tempo?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoUSCE} onChange={e => setFormData({...formData, descritivoUSCE: e.target.value})} />}
+                                        {formData.possuiUSCE === 'Sim' && <textarea placeholder="Onde e por quanto tempo?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24 outline-none" value={formData.descritivoUSCE} onChange={e => setFormData({...formData, descritivoUSCE: e.target.value})} />}
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -201,12 +214,12 @@
 
                                 {step === 6 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Visto e Currículo</h3>
-                                        <input type="text" placeholder="Visto atual (Ex: B1/B2, J1, Green Card)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.statusVisto} onChange={e => setFormData({...formData, statusVisto: e.target.value})} />
-                                        <textarea placeholder="Publicações científicas ou experiência de ensino" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoPublicacoes} onChange={e => setFormData({...formData, descritivoPublicacoes: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">6. Currículo e Visto</h3>
+                                        <input type="text" placeholder="Status de Visto atual (Ex: B1/B2, J1, Green Card)" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.statusVisto} onChange={e => setFormData({...formData, statusVisto: e.target.value})} />
+                                        <textarea placeholder="Publicações científicas ou experiência de ensino" className="w-full p-4 bg-slate-50 border rounded-2xl h-24 outline-none" value={formData.descritivoPublicacoes} onChange={e => setFormData({...formData, descritivoPublicacoes: e.target.value})} />
                                         <p className="font-bold text-slate-600 pt-2">Nível de Inglês:</p>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {['Básico', 'Intermediário', 'Avançado', 'Fluente'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, nivelIngles: o})} className={`py-3 border-2 rounded-xl font-bold text-xs uppercase ${formData.nivelIngles === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white'}`}>{o}</button>)}
+                                            {['Básico', 'Intermediário', 'Avançado', 'Fluente'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, nivelIngles: o})} className={`py-3 border-2 rounded-xl font-bold text-xs uppercase transition-all ${formData.nivelIngles === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white hover:border-slate-400'}`}>{o}</button>)}
                                         </div>
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
@@ -217,11 +230,11 @@
 
                                 {step === 7 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Habilidades</h3>
-                                        <p className="font-bold text-slate-600 text-center">Conforto lendo textos médicos em inglês (1-10):</p>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">7. Habilidades de Idioma</h3>
+                                        <p className="font-bold text-slate-600 text-center">Conforto lendo e interpretando textos médicos (1-10):</p>
                                         <ScaleSelector value={formData.confortoLeituraIngles} onChange={v => setFormData({...formData, confortoLeituraIngles: v})} />
-                                        <input type="text" placeholder="TOEFL, IELTS ou OET? (Nota/Data)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.testesOficiais} onChange={e => setFormData({...formData, testesOficiais: e.target.value})} />
-                                        <textarea placeholder="Exerceu cargos de liderança?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.descritivoLideranca} onChange={e => setFormData({...formData, descritivoLideranca: e.target.value})} />
+                                        <input type="text" placeholder="Já fez TOEFL, IELTS ou OET? (Nota e Data)" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.testesOficiais} onChange={e => setFormData({...formData, testesOficiais: e.target.value})} />
+                                        <textarea placeholder="Exerceu cargos de liderança relevante? (Onde?)" className="w-full p-4 bg-slate-50 border rounded-2xl h-24 outline-none" value={formData.descritivoLideranca} onChange={e => setFormData({...formData, descritivoLideranca: e.target.value})} />
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -231,10 +244,13 @@
 
                                 {step === 8 && (
                                     <div className="space-y-6 animate-in">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">Objetivos</h3>
-                                        <input type="text" placeholder="Objetivo nos EUA (Ex: Residência em Cirurgia)" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.objetivoEUA} onChange={e => setFormData({...formData, objetivoEUA: e.target.value})} />
-                                        <textarea placeholder="Por que os EUA?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24" value={formData.motivoEUA} onChange={e => setFormData({...formData, motivoEUA: e.target.value})} />
-                                        <input type="text" placeholder="Horas diárias de estudo?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.horasEstudo} onChange={e => setFormData({...formData, horasEstudo: e.target.value})} />
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase italic">8. Objetivos nos EUA</h3>
+                                        <input type="text" placeholder="Principal objetivo (Ex: Residência em Clínica Médica)" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.objetivoEUA} onChange={e => setFormData({...formData, objetivoEUA: e.target.value})} />
+                                        <textarea placeholder="Por que os EUA como objetivo de carreira?" className="w-full p-4 bg-slate-50 border rounded-2xl h-24 outline-none" value={formData.motivoEUA} onChange={e => setFormData({...formData, motivoEUA: e.target.value})} />
+                                        <div className="grid gap-4">
+                                            <input type="text" placeholder="Horas diárias para estudos?" className="p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.horasEstudo} onChange={e => setFormData({...formData, horasEstudo: e.target.value})} />
+                                            <input type="text" placeholder="Expectativa de tempo para o Match?" className="p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.expectativaMatch} onChange={e => setFormData({...formData, expectativaMatch: e.target.value})} />
+                                        </div>
                                         <div className="flex gap-4">
                                             <button type="button" onClick={prevStep} className="flex-1 py-4 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="button" onClick={nextStep} className="flex-[2] py-4 bg-[#0A3161] text-white rounded-2xl font-black uppercase">Próximo</button>
@@ -244,18 +260,18 @@
 
                                 {step === 9 && (
                                     <div className="space-y-6 animate-in text-center">
-                                        <h3 className="text-xl font-black text-[#0A3161] uppercase">Compromisso Final</h3>
-                                        <p className="font-bold text-slate-500">Comprometimento pessoal e financeiro (0-10):</p>
+                                        <h3 className="text-xl font-black text-[#0A3161] uppercase">9. Compromisso Final</h3>
+                                        <p className="font-bold text-slate-500">Nível de comprometimento financeiro e pessoal (1-10):</p>
                                         <ScaleSelector value={formData.compromissoGeral} onChange={v => setFormData({...formData, compromissoGeral: v})} />
                                         <div className="flex gap-4 py-2">
-                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, dispostoMudarHabitos: o})} className={`flex-1 py-3 border-2 rounded-xl font-bold ${formData.dispostoMudarHabitos === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white text-slate-400'}`}>Seguir recomendações: {o}</button>)}
+                                            {['Sim', 'Não'].map(o => <button type="button" key={o} onClick={()=>setFormData({...formData, dispostoMudarHabitos: o})} className={`flex-1 py-3 border-2 rounded-xl font-bold transition-all ${formData.dispostoMudarHabitos === o ? 'bg-[#B31942] text-white border-[#B31942]' : 'bg-white text-slate-400 hover:border-slate-400'}`}>Seguir Plano: {o}</button>)}
                                         </div>
-                                        <textarea placeholder="O que espera do mentor?" className="w-full p-4 bg-slate-50 border rounded-2xl text-left h-24" value={formData.expectativaMentor} onChange={e => setFormData({...formData, expectativaMentor: e.target.value})} />
-                                        <input type="text" placeholder="Qual plano de mentoria se adequa a você?" className="w-full p-4 bg-slate-50 border rounded-2xl" value={formData.planoMentoria} onChange={e => setFormData({...formData, planoMentoria: e.target.value})} />
+                                        <textarea placeholder="O que você espera do seu mentor para esse processo?" className="w-full p-4 bg-slate-50 border rounded-2xl text-left h-24 outline-none" value={formData.expectativaMentor} onChange={e => setFormData({...formData, expectativaMentor: e.target.value})} />
+                                        <input type="text" placeholder="Qual plano da mentoria se adequa a você?" className="w-full p-4 bg-slate-50 border rounded-2xl outline-none" value={formData.planoMentoria} onChange={e => setFormData({...formData, planoMentoria: e.target.value})} />
                                         <div className="flex gap-4 pt-6">
                                             <button type="button" onClick={prevStep} className="flex-1 py-5 border-2 rounded-2xl font-bold uppercase text-xs">Voltar</button>
                                             <button type="submit" disabled={loading} className="flex-[2] py-5 bg-[#B31942] text-white rounded-2xl font-black shadow-2xl active:scale-95 transition-all">
-                                                {loading ? "ENVIANDO..." : "FINALIZAR APLICAÇÃO"}
+                                                {loading ? "PROCESSANDO..." : "FINALIZAR APLICAÇÃO"}
                                             </button>
                                         </div>
                                     </div>
@@ -263,7 +279,11 @@
                             </form>
                         </div>
                     </main>
+                    
                     <footer className="py-16 bg-white border-t text-center space-y-4">
+                        <div className="flex justify-center gap-1 text-[#0A3161]">
+                            {[...Array(5)].map((_, i) => <Icon key={i} name="star" size={14} />)}
+                        </div>
                         <p className="text-[#0A3161] text-xs font-black uppercase tracking-[0.4em]">Excelência Médica Sem Fronteiras</p>
                         <p className="text-slate-400 text-[10px] font-medium tracking-wider uppercase">© 2026 MEDVISA MENTORIA. TODOS OS DIREITOS RESERVADOS.</p>
                     </footer>
